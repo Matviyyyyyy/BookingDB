@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{%  block content%}
+    <h1>Room #{{ room.number }} - Capacity {{ room.capacity }} ind.</h1>
+    <p>{{ room.description }}</p>
+    <h5>Price per night: {{ room.price_per_night }}$</h5>
+{% endblock %}

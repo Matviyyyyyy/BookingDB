@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{%  block content%}
+  {% for room in rooms %}
+    <br>
+    <h5>Room number: {{ room.number }}</h5>
+    <h5>Room capacity: {{ room.capacity }}</h5>
+    <h5>Room capacity: {{ room.status }}</h5>
+    <a href = "{% url 'room-details' room.id %}">More details --></a>
+     <hr>
+  {% endfor %}
+
+{% endblock %}
