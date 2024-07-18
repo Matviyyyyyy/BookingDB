@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{%  block content%}
+
+ {% if warn_message %}
+  {{ warn_message|safe }}
+{% endif %}
+<form method="POST" action="{% url 'book-room' room.id %}">
+    {% csrf_token %}
+
+    <label for="booking_check_in_date">Дата заселення:</label>
+    <input type="datetime-local" name = "booking_check_in_date" id = "booking_check_in_date" required>
+
+    <label for="booking_check_out_date">Дата виселення</label>
+    <input type="datetime-local" name = "booking_check_out_date" id = "booking_check_out_date" required>
+
+    <div class="form-group">
+      <label for="sel1">Payment method:</label>
+      <select class="form-control" id="sel1" name = "payment_method" required>
+          <option value = "Pay by card">Pay by card</option>
+          <option value = "Pay in cash">Pay in cash</option>
+      </select>
+    </div>
+
+    <button type="submit">Book</button>
+  </form>
+
+{% endblock content %}
+
+
