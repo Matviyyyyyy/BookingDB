@@ -49,6 +49,7 @@ def add_room(request):
         room_description = request.POST.get("room-description")
         room_price_per_night = request.POST.get("room-price-per-night")
         room_rating = request.POST.get("room-rating")
+        room_type = request.POST.get("select-type-room")
 
 
         room = Room.objects.create(
@@ -57,7 +58,8 @@ def add_room(request):
             mini_description=room_mini_desc,
             description=room_description,
             price_per_night=room_price_per_night,
-            rating = room_rating
+            rating = room_rating,
+            type = room_type
         )
         return redirect("room-details", room_id = room.id)
     else:
@@ -101,10 +103,9 @@ def book_room(request, room_id, user_id):
                     booking.check_in_date <= booking_check_out_date <= booking.check_out_date):
                 warn_message = '''
                 <br>
-                <h2 class="warn-date">Цей час вже зарезервовано</h2>
+                <h2 class="warn-date">Цей час вже зарезервовано!</h2>
                 <br>
                 '''
-                print("ЗАРЕЗЕРВОВАНО!!!")
                 request.session['warn_message'] = warn_message
                 return redirect("book-room-page", room_id=room_id)
 
@@ -176,7 +177,7 @@ def user_page(request, user_id):
         context=context
     )
 
-def finish_payment(request, payment_id):
+def finish_payment(request, payment_id, user_id):
     if request.method == "POST":
         payment = Payment.objects.get(id = payment_id)
         booking_bsue = payment.booking
@@ -184,9 +185,9 @@ def finish_payment(request, payment_id):
         bsue.delete()
         payment.booking.delete()
         payment.delete()
-        return redirect("user-page")
+        return redirect("user-page", user_id=user_id)
     else:
-        return redirect("user-page")
+        return redirect("user-page", user_id=user_id)
 
 def search_room(request):
     if request.method == "POST":
@@ -216,14 +217,14 @@ def add_service_to_booking(request, booking_id, user_id):
             user = user,
             employe = employe
         )
-        booking.total_price -= service.charge
+        booking.total_price += service.charge
         booking.save()
         payment = Payment.objects.filter(booking=booking).first()
-        payment.full_price -= service.charge
+        payment.full_price += service.charge
         payment.save()
-        return redirect('user-page')
+        return redirect('user-page', user_id=user_id)
     else:
-        return redirect("user-page")
+        return redirect("user-page", user_id=user_id)
 
 def services_booking(request, booking_id):
     booking = Booking.objects.get(id = booking_id)
@@ -236,7 +237,18 @@ def services_booking(request, booking_id):
     )
 
 
-
+def services_page(request):
+    services = Service.objects.all()
+    employes = Employe.objects.all()
+    context = {
+        "services": services,
+        "employes": employes
+    }
+    return render(
+        request,
+        template_name="booking/services.html",
+        context=context
+    )
 
 
 

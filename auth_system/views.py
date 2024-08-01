@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from auth_system.forms import CustomUserCreationForm, CustomUserAuthenticationForm
+from django.contrib.auth import login, authenticate, logout
 
 def register(request):
     if request.method == "POST":
@@ -31,3 +32,9 @@ def login_user(request):
     else:
         form = CustomUserAuthenticationForm()
     return render(request, "auth_system/login.html", {"form": form})
+
+
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+    return redirect('login')
