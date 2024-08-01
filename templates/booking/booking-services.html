@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% for bsue in bsues %}
+
+<p>{{ bsue.service.name }} - {{ bsue.service.charge }}</p>
+<hr>
+{% endfor %}
+
+{% endblock %}

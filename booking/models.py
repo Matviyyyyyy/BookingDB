@@ -1,41 +1,44 @@
 from django.db import models
+from auth_system.models import CustomUser
 
 # Create your models here.
 
 class Room(models.Model):
     number = models.IntegerField()
     capacity = models.IntegerField()
+    mini_description = models.CharField(max_length=150, null =True, blank=True)
     description = models.TextField(null=True, blank=True)
+    rating = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.BooleanField()
+    type = models.CharField(max_length=256, default="none")
 
     def __str__(self):
-        return f"{self.number} - {self.status}"
+        return f"{self.number}"
 
     class Meta:
         verbose_name = "Room"
         verbose_name_plural = "Rooms"
         ordering = ["number"]
 
-class User(models.Model):
-    first_name = models.CharField(max_length=256)
-    last_name = models.CharField(max_length=256)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=256)
-    date_of_birth = models.DateField()
-    role = models.CharField(max_length=256)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name} - {self.phone_number}"
-
-    class Meta:
-        verbose_name = "User"
-        verbose_name_plural = "Users"
-        ordering = ["first_name"]
+# class User(models.Model):
+#     first_name = models.CharField(max_length=256)
+#     last_name = models.CharField(max_length=256)
+#     email = models.EmailField()
+#     phone_number = models.CharField(max_length=256)
+#     date_of_birth = models.DateField()
+#     role = models.CharField(max_length=256)
+#
+#     def __str__(self):
+#         return f"{self.first_name} {self.last_name} - {self.phone_number}"
+#
+#     class Meta:
+#         verbose_name = "User"
+#         verbose_name_plural = "Users"
+#         ordering = ["first_name"]
 
 class Booking(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="rooms_booking")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="users_booking")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="users_booking")
     booking_date = models.DateTimeField(auto_now_add=True)
     check_in_date = models.DateTimeField()
     check_out_date = models.DateTimeField()
@@ -50,6 +53,7 @@ class Booking(models.Model):
         ordering = ["booking_date"]
 
 class Payment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user_payment")
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="bookings_payment")
     payment_date = models.DateTimeField(auto_now_add=True)
     full_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -83,7 +87,7 @@ class Service(models.Model):
     employe = models.ForeignKey(Employe, on_delete=models.CASCADE)
     name = models.CharField(max_length=256)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    charge = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.employe} - {self.name}"
@@ -94,10 +98,10 @@ class Service(models.Model):
         ordering = ["name"]
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uses_review")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="uses_review")
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="rooms_review")
     review_date = models.DateField(auto_now_add=True)
-    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    rating = models.IntegerField()
     comment = models.TextField()
 
     def __str__(self):
@@ -108,6 +112,19 @@ class Review(models.Model):
         verbose_name_plural = "Reviews"
         ordering = ["rating"]
 
+class BookingServiceEmploye(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    employe = models.ForeignKey(Employe, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.booking.id} - {self.service.id} - {self.employe.first_name}"
+
+    class Meta:
+        verbose_name = "BookingService"
+        verbose_name_plural = "BookingServices"
+        ordering = ["booking"]
 
 
 
